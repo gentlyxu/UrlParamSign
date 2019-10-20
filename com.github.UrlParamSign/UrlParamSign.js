@@ -1,32 +1,20 @@
 // Extensions are implemented as JavaScript classes
-var UrlParamSign = function() {
+const UrlParamSign = function() {
   // implement the evaluate() method to generate the dynamic value
   this.evaluate = function(ctx) {
-  	const signKey = ctx.getEnvironmentVariableByName("signKey").getCurrentValue();
-  	const request = ctx.getCurrentRequest();
-  	let qs = request.urlQuery.split("&");
-  	if(!Array.isArray(qs)){
-  		return null;
-  	}
+    const signKey = ctx.getEnvironmentVariableByName("signKey").getCurrentValue();
+  	const req = ctx.getCurrentRequest();
+    const queryString = req.getUrlParametersNames().filter(function(k) { return k[0] !== "_" }).sort().map(function(k) {
+      return `${k}=${req.getUrlParameterByName(k)}`;
+    }).join("&");
 
-  	const usefulQuery = [];
-  	for(let p of qs){
-  		if(p[0] === '_'){
-  			continue;
-  		}
-  		usefulQuery.push(p);
-  	}
-
-  	let input = `${signKey}${usefulQuery.sort().join("&")}${signKey}`;
-    input = input.replace(/:/g, "%3A");
-    input = input.replace(/\?/g, "%3F");
-  	console.log(input);
+    console.log(queryString);
 
     const dynamicValue = DynamicValue('com.luckymarmot.HashDynamicValue', {
-        'input': input,
+        'input': `${signKey}${queryString}${signKey}`,
         'hashType': 5
-  	});
-  	return dynamicValue.getEvaluatedString();
+    });
+    return dynamicValue.getEvaluatedString();
   }
 }
 // set the Extension Identifier (must be same as the directory name)
@@ -36,4 +24,4 @@ UrlParamSign.title = "UrlParamSign";
 // link to the Dynamic Value documentation
 UrlParamSign.help = "https://github.com/gentlyxu/UrlParamSign";
 // call to register function is required
-registerDynamicValueClass(UrlParamSign)
+registerDynamicValueClass(UrlParamSign);
