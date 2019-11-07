@@ -6,11 +6,11 @@ const UrlParamSign = function() {
     const req = ctx.getCurrentRequest();
     const queryString = req.getUrlParametersNames().filter(function(k) { return k[0] !== "_" }).sort().map(function(k) {
         let qs1 = req.getUrlParameterByName(k);
-	qs1 = encodeURIComponent(qs1);
+        qs1 = encodeURIComponent(qs1);
         return `${k}=${qs1}`;
       }).join("&");
 
-      console.log(queryString);
+      console.log(`${signKey}${queryString}${signKey}`);
 
       const dynamicValue = DynamicValue('com.luckymarmot.HashDynamicValue', {
         'input': `${signKey}${queryString}${signKey}`,
@@ -27,3 +27,4 @@ const UrlParamSign = function() {
   UrlParamSign.help = "https://github.com/gentlyxu/UrlParamSign";
   // call to register function is required
   registerDynamicValueClass(UrlParamSign);
+
