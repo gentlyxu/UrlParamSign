@@ -6,7 +6,7 @@ const UrlParamSign = function() {
     const req = ctx.getCurrentRequest();
     const queryString = req.getUrlParametersNames().filter(function(k) { return k[0] !== "_" }).sort().map(function(k) {
         let qs1 = req.getUrlParameterByName(k);
-        qs1 = qs1.replace(/([^\*\'.~!a-z0-9])/g, function($1){return "%" + $1.charCodeAt(0).toString(16).toUpperCase()});
+	qs1 = encodeURIComponent(qs1);
         return `${k}=${qs1}`;
       }).join("&");
 
